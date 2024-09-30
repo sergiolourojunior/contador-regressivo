@@ -208,3 +208,23 @@ window.addEventListener('click', (event) => {
         inputData.value = '';
     }
 });
+
+const addCalendarButton = document.getElementById('addCalendarButton');
+addCalendarButton.addEventListener('click', () => {
+    if (!frase || !dataParam) {
+        alert('Frase ou data inválida para criar o evento.');
+        return;
+    }
+
+    const startDate = new Date(dataParam);
+    const endDate = new Date(startDate.getTime() + (60 * 60 * 1000)); // Evento de 1 hora
+
+    const eventUrl = window.location.href;
+
+    const startDateUTC = startDate.toISOString().replace(/-|:|\.\d\d\d/g,"");
+    const endDateUTC = endDate.toISOString().replace(/-|:|\.\d\d\d/g,"");
+
+    const calUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(frase)}&dates=${startDateUTC}/${endDateUTC}&details=Este%20evento%20foi%20criado%20a%20partir%20do%20site: ${encodeURIComponent(eventUrl)}. Entre no link e acompanhe a contagem regressiva.`;
+
+    window.open(calUrl, '_blank');
+});
