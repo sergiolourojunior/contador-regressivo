@@ -123,10 +123,88 @@ if (isNaN(targetDate)) {
         document.getElementById('seconds').textContent = seconds;
 
         // Atualiza a mensagem
-        document.getElementById('message').textContent = `para o ${frase}`;
+        document.getElementById('message').textContent = `para ${frase}`;
     }
 
     // Chamada inicial e intervalo de atualização
     updateCountdown();
     const intervalId = setInterval(updateCountdown, 1000);
 }
+
+const shareButton = document.getElementById('shareButton');
+shareButton.addEventListener('click', async () => {
+    const shareData = {
+        title: 'Contagem Regressiva',
+        text: `Confira esta contagem regressiva para ${frase}!`,
+        url: window.location.href
+    };
+
+    if (navigator.share) {
+        try {
+            await navigator.share(shareData);
+            console.log('Conteúdo compartilhado com sucesso');
+        } catch (err) {
+            console.error('Erro ao compartilhar:', err);
+        }
+    } else {
+        // Fallback para navegadores que não suportam o Web Share API
+        alert('Compartilhamento não suportado neste navegador. Copie o link: ' + window.location.href);
+    }
+});
+
+const createButton = document.getElementById('createButton');
+const createModal = document.getElementById('createModal');
+const cancelButton = document.getElementById('cancelButton');
+const generateButton = document.getElementById('generateButton');
+const inputFrase = document.getElementById('inputFrase');
+const inputData = document.getElementById('inputData');
+const linkContainer = document.getElementById('linkContainer');
+const generatedLink = document.getElementById('generatedLink');
+const copyLinkButton = document.getElementById('copyLinkButton');
+
+createButton.addEventListener('click', () => {
+    createModal.style.display = 'flex';
+});
+
+cancelButton.addEventListener('click', () => {
+    createModal.style.display = 'none';
+    linkContainer.classList.add('hidden');
+    inputFrase.value = '';
+    inputData.value = '';
+});
+
+generateButton.addEventListener('click', () => {
+    const fraseValue = inputFrase.value.trim();
+    const dataValue = inputData.value;
+
+    if (!fraseValue || !dataValue) {
+        alert('Por favor, preencha todos os campos.');
+        return;
+    }
+
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.append('frase', fraseValue);
+    url.searchParams.append('data', dataValue);
+
+    generatedLink.href = url.toString();
+    generatedLink.textContent = url.toString();
+    linkContainer.classList.remove('hidden');
+});
+
+copyLinkButton.addEventListener('click', () => {
+    navigator.clipboard.writeText(generatedLink.href).then(() => {
+        alert('Link copiado para a área de transferência!');
+    }, (err) => {
+        alert('Erro ao copiar o link: ', err);
+    });
+});
+
+// Fecha o modal ao clicar fora dele
+window.addEventListener('click', (event) => {
+    if (event.target === createModal) {
+        createModal.style.display = 'none';
+        linkContainer.classList.add('hidden');
+        inputFrase.value = '';
+        inputData.value = '';
+    }
+});
